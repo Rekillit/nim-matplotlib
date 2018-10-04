@@ -108,6 +108,7 @@ proc createSinglePlot*(): Plot =
   result = Plot(script: "")
   result += """
   import matplotlib
+  from cycler import cycler
 
   # print matplotlib.rcParams
   # print [f.name for f in matplotlib.font_manager.fontManager.ttflist]
@@ -124,15 +125,10 @@ proc createSinglePlot*(): Plot =
   matplotlib.rcParams['ytick.color'] = better_black
 
   # from palettable.colorbrewer.qualitative import Set1_9
-  matplotlib.rcParams['axes.color_cycle'] = ['#E41A1C',
-                                             '#377EB8',
-                                             '#4DAF4A',
-                                             '#984EA3',
-                                             '#FF7F00',
-                                             '#FFFF33',
-                                             '#A65628',
-                                             '#F781BF',
-                                             '#999999']
+  # Update to new matplotlib syntax
+  matplotlib.rc('axes', prop_cycle=(cycler('color', ['r', 'g', 'b', 'y']) +
+                          cycler('linestyle', ['-', '--', ':', '-.'])))
+
   # improve grid
   matplotlib.rcParams['grid.color'] = '#999999'
 
@@ -335,7 +331,7 @@ proc saveScript*(p: Plot, fn: string) =
 proc run*(p: Plot, ignoreError = true) =
   var fn = getTempDir() / ".nim-matplotlib.py"
   writeFile(fn, p.script)
-  var ret = execShellCmd("python \"" & fn & "\"")
+  var ret = execShellCmd("python3 \"" & fn & "\"")
   if ret != 0 and not ignoreError:
     raise newException(IOError, "failed to run plot script")
 
